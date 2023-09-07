@@ -12,7 +12,7 @@ function App() {
     .then(response => {
       setActivities(response.data);
     });
-  }, []);
+  }, []);  
 
   return (
     <div>
