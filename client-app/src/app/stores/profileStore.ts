@@ -13,6 +13,10 @@ export default class ProfileStore {
         makeAutoObservable(this);
     }
 
+    get getProfile() {
+        return this.profile;
+    }
+
     get isCurrentUser() {
         if (store.userStore.user && this.profile) {
             return store.userStore.user.userName === this.profile.username;

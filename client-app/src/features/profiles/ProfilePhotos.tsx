@@ -20,6 +20,7 @@ interface Props {
 export default observer(function ProfilePhotos({ profile }: Props) {
   const {
     profileStore: {
+      getProfile,
       isCurrentUser,
       uploadPhoto,
       uploading,
@@ -27,6 +28,7 @@ export default observer(function ProfilePhotos({ profile }: Props) {
       setMainPhoto,
       deletePhoto,
     },
+    activityStore: { activityRegistry },
   } = useStore();
 
   const [addPhotoMode, setAddPhotoMode] = useState(false);
@@ -35,6 +37,28 @@ export default observer(function ProfilePhotos({ profile }: Props) {
   function handleMainPhoto(photo: Photo, e: SyntheticEvent<HTMLButtonElement>) {
     setTarget(e.currentTarget.name);
     setMainPhoto(photo);
+    setProfilePhotoToAllActivitiesAndAttendees(photo);
+  }
+
+  // Set the host image and the attendee image of the profile that had the main photo changed.
+  function setProfilePhotoToAllActivitiesAndAttendees(photo: Photo) {
+    activityRegistry.forEach((a) => {
+      if (a.hostUserName === getProfile?.username) {
+        if (a.host) {
+          a.host.image = photo.url;
+        }
+      }
+      let profile = a.attendees.find(
+        (p) => p.username === getProfile?.username
+      );
+      if (profile) {
+        profile.image = photo.url;
+        a.attendees = a.attendees.filter(
+          (p) => p.username !== getProfile?.username
+        );
+        a.attendees.push(profile);
+      }
+    });
   }
 
   function handleDeletePhoto(id: string, e: SyntheticEvent<HTMLButtonElement>) {
