@@ -9,6 +9,8 @@ namespace Application.Core
     {
         public MappingProfiles()
         {
+            string currentUsername = null;
+
             CreateMap<Activity, Activity>();
             CreateMap<Activity, ActivityDto>()
                 .ForMember(d => d.HostUserName, o => o.MapFrom(s => s.Attendees.FirstOrDefault(x => x.IsHost).AppUser.UserName));
@@ -16,9 +18,17 @@ namespace Application.Core
                 .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.AppUser.DisplayName))
                 .ForMember(d => d.Username, o => o.MapFrom(s => s.AppUser.UserName))
                 .ForMember(d => d.Bio, o => o.MapFrom(s => s.AppUser.Bio))
-                .ForMember(a => a.Image, o => o.MapFrom(s => s.AppUser.Photos.FirstOrDefault(x => x.IsMain).Url));
+                .ForMember(a => a.Image, o => o.MapFrom(s => s.AppUser.Photos.FirstOrDefault(x => x.IsMain).Url))
+                .ForMember(a => a.FollowersCount, o => o.MapFrom(s => s.AppUser.Followers.Count))
+                .ForMember(a => a.FollowingCount, o => o.MapFrom(s => s.AppUser.Followings.Count))
+                .ForMember(a => a.Following,
+                    o => o.MapFrom(s => s.AppUser.Followers.Any(x => x.Observer.UserName == currentUsername)));
             CreateMap<AppUser, Profiles.Profile>()
-                .ForMember(a => a.Image, o => o.MapFrom(s => s.Photos.FirstOrDefault(x => x.IsMain).Url));
+                .ForMember(a => a.Image, o => o.MapFrom(s => s.Photos.FirstOrDefault(x => x.IsMain).Url))
+                .ForMember(a => a.FollowersCount, o => o.MapFrom(s => s.Followers.Count))
+                .ForMember(a => a.FollowingCount, o => o.MapFrom(s => s.Followings.Count))
+                .ForMember(a => a.Following,
+                    o => o.MapFrom(s => s.Followers.Any(x => x.Observer.UserName == currentUsername)));
             CreateMap<Comment, CommentDto>()
                 .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.Author.DisplayName))
                 .ForMember(d => d.Username, o => o.MapFrom(s => s.Author.UserName))
