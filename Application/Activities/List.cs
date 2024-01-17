@@ -38,8 +38,6 @@ namespace Application.Activities
                         new { currentUsername = _userAccessor.GetUserName() })
                     .AsQueryable();
 
-                var list = query.ToList();
-
                 if (request.Params.IsGoing && !request.Params.IsHost)
                 {
                     query = query.Where(g => g.Attendees.Any(a => a.Username == _userAccessor.GetUserName()));
